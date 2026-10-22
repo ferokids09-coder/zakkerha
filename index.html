@@ -121,6 +121,11 @@ h2 { font-family: var(--site-font-heading); color: var(--site-primary); font-siz
 .category-card .emoji { display: grid; place-items: center; width: 43px; height: 43px; flex: 0 0 43px; border-radius: 13px; background: var(--mint); font-size: 1.25rem; }
 .category-card b { display: block; color: var(--site-primary); font-size: .93rem; }
 .category-card small { display: block; color: var(--muted); font-size: .76rem; }
+.coming-pill { display:inline-block; vertical-align:middle; margin-inline-start:5px; border:1px solid #f0d8a6; background:#fff4dc; color:#85591a; border-radius:999px; padding:1px 6px; font-size:.63rem; font-weight:900; white-space:nowrap; }
+.coming-panel { grid-column:1/-1; text-align:center; padding:35px 20px; border:1px dashed #e0bd73; border-radius:18px; background:#fffaf0; color:#6c552a; }
+.coming-panel strong { display:block; color:#805617; font-size:1.35rem; margin-bottom:8px; }
+.coming-panel p { max-width:650px; margin:0 auto 14px; }
+.coming-panel .btn { margin-top:4px; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .feature-box { border: 1px solid var(--line); border-radius: 22px; background: var(--surface); padding: 24px; }
 .feature-box h3 { color: var(--site-primary); margin: 0 0 7px; font-size: 1.2rem; }
@@ -172,7 +177,7 @@ h2 { font-family: var(--site-font-heading); color: var(--site-primary); font-siz
   <aside class="hero-panel"><p class="panel-label">رحلة التعلم في 3 خطوات</p><div class="hero-step"><span class="step-icon">🧭</span><div><b>حدّد هدفك</b><small>مادة دراسية أو مهارة جديدة</small></div></div><div class="hero-step"><span class="step-icon">🔎</span><div><b>اختار المصدر</b><small>حسب المستوى واللغة والتكلفة</small></div></div><div class="hero-step"><span class="step-icon">🚀</span><div><b>ابدأ بخطوة صغيرة</b><small>مصدر واحد وتطبيق منتظم</small></div></div></aside>
 </div></header>
 <main class="container">
-  <section class="metrics" aria-label="مميزات ذاكرها"><div class="metric"><strong id="metricResources">—</strong><span>مصدر تعليمي منظم</span></div><div class="metric"><strong>10+</strong><span>مجالات للتعلّم</span></div><div class="metric"><strong>عربي + لغات</strong><span>مصادر بمستويات مختلفة</span></div><div class="metric"><strong>مجاني</strong><span>استخدام دليل ذاكرها</span></div></section>
+  <section class="metrics" aria-label="مميزات ذاكرها"><div class="metric"><strong id="metricResources">—</strong><span>مصدر تعليمي منظم</span></div><div class="metric"><strong id="metricCategories">50+</strong><span>مجال للتعلّم</span></div><div class="metric"><strong>عربي + لغات</strong><span>مصادر بمستويات مختلفة</span></div><div class="metric"><strong>مجاني</strong><span>استخدام دليل ذاكرها</span></div></section>
 
   <section class="section" id="categories"><div class="section-head"><div><span class="kicker">اختار اتجاهك</span><h2>هتتعلم إيه النهارده؟</h2><p class="section-desc">اضغط على المجال علشان تشوف مصادره. مش لازم تكون عارف اسم منصة بعينها — ابدأ بالموضوع اللي مهتم بيه.</p></div></div><div class="category-grid" id="categoryGrid"></div></section>
 
@@ -214,15 +219,60 @@ h2 { font-family: var(--site-font-heading); color: var(--site-primary); font-siz
 <script>
 'use strict';
 const categories = [
- {id:'school',name:'مناهج المدرسة',icon:'🏫',desc:'مواد ومصادر دراسية'},
- {id:'english',name:'اللغات',icon:'🗣️',desc:'إنجليزي ولغات أخرى'},
- {id:'programming',name:'البرمجة والتقنية',icon:'💻',desc:'كود وعلوم حاسب'},
- {id:'science',name:'العلوم والرياضيات',icon:'🔬',desc:'فهم وتجارب ومحاكاة'},
+ {id:'school',name:'مناهج المدرسة',icon:'🏫',desc:'المناهج المصرية والمواد الدراسية'},
+ {id:'arabic',name:'اللغة العربية',icon:'✍️',desc:'نحو وبلاغة وأدب وتعبير — قريباً'},
+ {id:'english',name:'اللغة الإنجليزية واللغات',icon:'🗣️',desc:'إنجليزي ومصادر لغات متعددة'},
+ {id:'french',name:'اللغة الفرنسية',icon:'🇫🇷',desc:'قواعد ومفردات واستماع — قريباً'},
+ {id:'german',name:'اللغة الألمانية',icon:'🇩🇪',desc:'تعلم الألمانية من البداية — قريباً'},
+ {id:'spanish',name:'اللغة الإسبانية',icon:'🇪🇸',desc:'محادثة وقواعد ومفردات — قريباً'},
+ {id:'other-languages',name:'لغات العالم والترجمة',icon:'🌍',desc:'إيطالي وصيني وياباني وترجمة — قريباً'},
+ {id:'math',name:'الرياضيات',icon:'➗',desc:'حساب وجبر وهندسة وإحصاء — قريباً'},
+ {id:'physics',name:'الفيزياء',icon:'⚛️',desc:'حركة وطاقة وكهرباء وميكانيكا — قريباً'},
+ {id:'chemistry',name:'الكيمياء',icon:'🧪',desc:'عناصر وتفاعلات وتجارب آمنة — قريباً'},
+ {id:'biology',name:'الأحياء والعلوم',icon:'🧬',desc:'جسم الإنسان والكائنات والبيئة — قريباً'},
+ {id:'science',name:'العلوم والرياضيات التفاعلية',icon:'🔬',desc:'فهم وتجارب ومحاكاة علمية'},
+ {id:'astronomy',name:'الفلك والفضاء',icon:'🚀',desc:'الكون والكواكب واستكشاف الفضاء — قريباً'},
+ {id:'geography',name:'الجغرافيا والجيولوجيا',icon:'🌋',desc:'الأرض والخرائط والمناخ — قريباً'},
+ {id:'history',name:'التاريخ والحضارات',icon:'🏺',desc:'التاريخ المصري والعالمي — قريباً'},
+ {id:'religion',name:'الدراسات الدينية والأخلاق',icon:'🕌',desc:'معرفة دينية وأخلاقية — قريباً'},
+ {id:'programming',name:'البرمجة وعلوم الحاسب',icon:'💻',desc:'برمجة وتطوير ويب ومشاريع تطبيقية'},
+ {id:'ai',name:'الذكاء الاصطناعي',icon:'🤖',desc:'تعلم الآلة والذكاء الاصطناعي — قريباً'},
+ {id:'data',name:'تحليل البيانات وعلوم البيانات',icon:'📊',desc:'بيانات وإحصاء ولوحات معلومات — قريباً'},
+ {id:'cybersecurity',name:'الأمن السيبراني',icon:'🛡️',desc:'أمن رقمي ودفاع واستخدام مسؤول — قريباً'},
+ {id:'webdev',name:'تطوير المواقع',icon:'🌐',desc:'HTML وCSS وJavaScript — قريباً'},
+ {id:'appdev',name:'تطوير تطبيقات الموبايل',icon:'📱',desc:'تطبيقات أندرويد وiOS — قريباً'},
+ {id:'gamedev',name:'صناعة الألعاب',icon:'🎮',desc:'تصميم وبرمجة الألعاب — قريباً'},
+ {id:'robotics',name:'الروبوتات والإلكترونيات',icon:'🦾',desc:'دوائر ومتحكمات وروبوتات — قريباً'},
  {id:'design',name:'التصميم والفنون',icon:'🎨',desc:'رسم وتصميم وثلاثي أبعاد'},
- {id:'business',name:'مهارات العمل',icon:'📈',desc:'إنتاجية وأعمال ومهارات رقمية'},
- {id:'courses',name:'دورات عامة',icon:'🎓',desc:'تعلم ذاتي وتخصصات مختلفة'},
+ {id:'graphic-design',name:'التصميم الجرافيكي',icon:'🖌️',desc:'هوية بصرية وألوان وتخطيط — قريباً'},
+ {id:'uiux',name:'تصميم UI/UX وتجربة المستخدم',icon:'🧩',desc:'تصميم واجهات وتجارب رقمية — قريباً'},
+ {id:'drawing',name:'الرسم والتلوين',icon:'🖍️',desc:'رسم تقليدي ورقمي — قريباً'},
+ {id:'3d-animation',name:'الأنيميشن و3D',icon:'🎬',desc:'تحريك ونمذجة ومؤثرات — قريباً'},
+ {id:'photography',name:'التصوير الفوتوغرافي',icon:'📷',desc:'تصوير وإضاءة وتكوين — قريباً'},
+ {id:'video-editing',name:'المونتاج وصناعة الفيديو',icon:'🎞️',desc:'مونتاج وصوت وإنتاج محتوى — قريباً'},
+ {id:'writing',name:'الكتابة وصناعة المحتوى',icon:'📝',desc:'كتابة إبداعية وسيناريو ومقالات — قريباً'},
  {id:'reading',name:'القراءة والبحث',icon:'📚',desc:'كتب ومراجع ومهارات بحث'},
- {id:'study',name:'مهارات التعلّم',icon:'🧠',desc:'ذاكرة وتركيز وتنظيم'}
+ {id:'study',name:'مهارات التعلّم والمذاكرة',icon:'🧠',desc:'ذاكرة وتركيز وتنظيم'},
+ {id:'business',name:'الأعمال والمهارات المهنية',icon:'📈',desc:'إنتاجية وأعمال ومهارات رقمية'},
+ {id:'entrepreneurship',name:'ريادة الأعمال والمشروعات',icon:'🚀',desc:'بناء الأفكار والمشروعات — قريباً'},
+ {id:'finance',name:'المال والثقافة المالية',icon:'💰',desc:'ميزانية وادخار ومفاهيم مالية — قريباً'},
+ {id:'marketing',name:'التسويق والإعلان',icon:'📣',desc:'تسويق رقمي وعلامات تجارية — قريباً'},
+ {id:'communication',name:'التواصل والخطابة',icon:'🎤',desc:'عرض الأفكار والحوار — قريباً'},
+ {id:'career',name:'المهن والتوجيه المهني',icon:'🧭',desc:'اكتشاف المسارات المهنية — قريباً'},
+ {id:'courses',name:'الدورات والتعلم الجامعي',icon:'🎓',desc:'تعلم ذاتي وتخصصات مختلفة'},
+ {id:'university',name:'الجامعة والمنح والقبول',icon:'🏛️',desc:'اختيار تخصص ومنح واستعداد — قريباً'},
+ {id:'exam-prep',name:'الامتحانات والاستعداد للاختبارات',icon:'📝',desc:'استراتيجيات مراجعة وتدريب — قريباً'},
+ {id:'psychology',name:'علم النفس والتفكير',icon:'🧠',desc:'التفكير والسلوك والتعلم — قريباً'},
+ {id:'philosophy',name:'الفلسفة والمنطق',icon:'💭',desc:'أسئلة كبرى وتفكير نقدي — قريباً'},
+ {id:'law-civics',name:'القانون والمواطنة',icon:'⚖️',desc:'مبادئ القانون والحقوق — قريباً'},
+ {id:'environment',name:'البيئة والاستدامة',icon:'🌱',desc:'المناخ والطاقة والاستدامة — قريباً'},
+ {id:'health',name:'الصحة والإسعافات والتوعية',icon:'🩺',desc:'تثقيف صحي موثوق — قريباً'},
+ {id:'sports',name:'الرياضة واللياقة',icon:'⚽',desc:'تدريب ومهارات رياضية — قريباً'},
+ {id:'cooking',name:'الطبخ والتغذية',icon:'🍳',desc:'مهارات مطبخ وتغذية عامة — قريباً'},
+ {id:'crafts',name:'الأشغال اليدوية والحرف',icon:'🧵',desc:'صناعة يدوية ومهارات عملية — قريباً'},
+ {id:'music',name:'الصوت والإنتاج الصوتي',icon:'🎧',desc:'تسجيل ومكساج وصوت — قريباً'},
+ {id:'life-skills',name:'المهارات الحياتية',icon:'🧰',desc:'حل المشكلات والاستقلالية — قريباً'},
+ {id:'accessibility',name:'التعلم الميسر وذوو الإعاقة',icon:'♿',desc:'مصادر وطرق تعلم أكثر إتاحة — قريباً'}
 ];
 // Catalogue links point to original providers. Availability/cost descriptions are intentionally conservative.
 const resources = [
@@ -288,7 +338,8 @@ for (const c of categories) {
   goalSelect.add(new Option(c.name, c.id));
   suggestCategory.add(new Option(c.name, c.id));
 }
-categoryGrid.innerHTML = categories.map(c=>`<button type="button" class="category-card" data-category="${c.id}"><span class="emoji" aria-hidden="true">${c.icon}</span><span><b>${escapeHTML(c.name)}</b><small>${escapeHTML(c.desc)}</small></span></button>`).join('');
+categoryGrid.innerHTML = categories.map(c=>{const hasResources=resources.some(r=>r.category===c.id);return `<button type="button" class="category-card" data-category="${c.id}"><span class="emoji" aria-hidden="true">${c.icon}</span><span><b>${escapeHTML(c.name)}${hasResources?'':' <span class=\"coming-pill\">Coming soon</span>'}</b><small>${escapeHTML(c.desc)}</small></span></button>`;}).join('');
+document.getElementById('metricCategories').textContent=categories.length;
 function escapeHTML(value) { return String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
 let selectedLanguage = 'all';
 let onlySaved = false;
@@ -313,7 +364,13 @@ function renderResources() {
   document.getElementById('resultsTitle').textContent=onlySaved?'المصادر المحفوظة':category==='all'?'كل مصادر التعلم':categoryMap[category].name;
   document.getElementById('savedCount').textContent=saved.size;
   const box=document.getElementById('resources');
-  if(!list.length){box.innerHTML='<div class="empty"><b>ملقيناش نتائج مطابقة</b>جرّب كلمة بحث مختلفة، أو امسح بعض الفلاتر، أو احفظ مصادر من المكتبة علشان تظهر هنا.</div>';return;}
+  if(!list.length){
+    if(category!=='all' && !onlySaved && !resources.some(r=>r.category===category) && !query && level==='all' && cost==='all' && selectedLanguage==='all'){
+      box.innerHTML=`<div class="coming-panel"><strong>🚧 Coming soon — المجال ده تحت التجهيز</strong><p>المجال موجود بالفعل في ذاكرها، لكننا لم نضف له مصادر موثوقة بعد. هنضيف روابط أصلية ومصادر مناسبة للمستويات المختلفة بدل ما نحط روابط عشوائية.</p><button type="button" class="btn btn-primary" id="suggestComingResource">اقترح مصدر للمجال</button></div>`;
+      document.getElementById('suggestComingResource').addEventListener('click',()=>{document.getElementById('suggestCategory').value=category;document.getElementById('suggest').scrollIntoView({behavior:'smooth'});});
+    } else {box.innerHTML='<div class="empty"><b>ملقيناش نتائج مطابقة</b>جرّب كلمة بحث مختلفة، أو امسح بعض الفلاتر، أو احفظ مصادر من المكتبة علشان تظهر هنا.</div>';}
+    return;
+  }
   box.innerHTML=list.map(r=>`<article class="resource"><div class="resource-top"><span class="resource-icon" aria-hidden="true">${r.icon}</span><div class="resource-labels"><span class="pill ${r.official?'official':''}">${r.official?'مصدر رسمي':escapeHTML(r.type)}</span><span class="pill ${r.cost==='يتفاوت'||r.cost==='مجاني جزئياً'?'limited':''}">${escapeHTML(r.cost)}</span></div></div><h3>${escapeHTML(r.title)}</h3><p>${escapeHTML(r.desc)}</p><div class="resource-meta"><span class="tag">${escapeHTML(categoryMap[r.category].name)}</span><span class="tag">${escapeHTML(r.level)}</span><span class="tag">${escapeHTML(r.language)}</span>${r.tags.slice(0,2).map(t=>`<span class="tag">${escapeHTML(t)}</span>`).join('')}</div><div class="card-actions"><a class="visit-link" href="${escapeHTML(r.url)}" target="_blank" rel="noopener noreferrer">افتح المصدر الأصلي ↗</a><button type="button" class="save-btn" data-save="${r.id}" aria-label="${saved.has(r.id)?'إزالة من المحفوظات':'حفظ المصدر'}: ${escapeHTML(r.title)}" aria-pressed="${saved.has(r.id)}">${saved.has(r.id)?'♥':'♡'}</button></div></article>`).join('');
 }
 function resetFilters() { document.getElementById('search').value=''; categorySelect.value='all'; document.getElementById('level').value='all'; document.getElementById('cost').value='all'; document.getElementById('sort').value='recommended'; selectedLanguage='all'; onlySaved=false; document.querySelectorAll('[data-language]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.language==='all'))); renderResources(); }
