@@ -46,6 +46,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .nav-links a:hover { color: var(--gold); }
 .nav-actions { display: flex; gap: 8px; align-items: center; }
 .icon-btn { display: inline-flex; gap: 7px; align-items: center; justify-content: center; border: 1px solid #ffffff40; border-radius: 12px; padding: 9px 12px; background: #ffffff0d; color: white; font-size: .88rem; }
+/* Make the language switch unmistakably look and behave like a button. */
+#languageToggle { appearance: none; -webkit-appearance: none; position: relative; z-index: 50; min-height: 42px; padding: 9px 14px; border: 2px solid var(--gold); border-radius: 12px; background: var(--gold); color: var(--site-primary); font-weight: 900; cursor: pointer; box-shadow: 0 3px 0 rgba(0,0,0,.15); }
+#languageToggle:hover { filter: brightness(1.05); transform: translateY(-1px); }
+#languageToggle:active { transform: translateY(1px); box-shadow: none; }
+#languageToggle:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 .hero-wrap { background: var(--site-primary); color: white; position: relative; isolation: isolate; }
 .hero-wrap:before { content: ""; position: absolute; z-index: -1; width: 440px; height: 440px; border-radius: 50%; background: var(--site-secondary); opacity: calc(.17 * var(--site-decoration-opacity)); top: -250px; left: -120px; filter: blur(4px); }
 .hero { display: grid; grid-template-columns: 1.3fr .7fr; gap: 40px; align-items: center; padding: 58px 0 88px; }
@@ -532,10 +537,29 @@ function zakkerhaApplyLanguage() {
   document.querySelectorAll('.category-card').forEach(el=>{el.style.textAlign=isEnglish?'left':'right';});
   document.querySelectorAll('.output').forEach(el=>{if(el.style.display==='block'){/* generated output can be regenerated in the selected language */}});
 }
-document.getElementById('languageToggle').addEventListener('click',()=>{
-  zakkerhaLanguage = zakkerhaLanguage === 'ar' ? 'en' : 'ar';
-  zakkerhaApplyLanguage();
-});
+// Register the language switch before the first render so it remains responsive
+// even if an optional translation for a card or metadata field fails.
+const zakkerhaLanguageButton = document.getElementById('languageToggle');
+if (zakkerhaLanguageButton) {
+  zakkerhaLanguageButton.addEventListener('click', function () {
+    zakkerhaLanguage = zakkerhaLanguage === 'ar' ? 'en' : 'ar';
+    const isEnglish = zakkerhaLanguage === 'en';
+    // Immediate visible feedback, independent of the rest of the translation pass.
+    document.documentElement.lang = isEnglish ? 'en' : 'ar';
+    document.documentElement.dir = isEnglish ? 'ltr' : 'rtl';
+    zakkerhaLanguageButton.textContent = isEnglish ? '🇪🇬 العربية' : '🇺🇸 English';
+    zakkerhaLanguageButton.setAttribute('aria-label', isEnglish ? 'تغيير اللغة' : 'Switch language');
+    try {
+      zakkerhaApplyLanguage();
+    } catch (error) {
+      console.error('Zakkerha language translation issue:', error);
+      // Keep the switch usable and show a visible hint instead of silently failing.
+      zakkerhaLanguageButton.title = isEnglish
+        ? 'Some page text may not be translated yet.'
+        : 'قد لا تكون بعض نصوص الصفحة مترجمة بعد.';
+    }
+  });
+}
 const zakkerhaOriginalRenderResources = renderResources;
 renderResources = function() { zakkerhaOriginalRenderResources(); if (zakkerhaLanguage === 'en') zakkerhaApplyLanguage(); };
 
